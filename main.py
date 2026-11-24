@@ -23,10 +23,19 @@ ENTRY = (
 OUTPUT_PATH = "/output/entry.txt"
 
 
+def validate_entry() -> None:
+    """Validate ENTRY; raise ValueError on failure (asserts vanish under -O)."""
+    if not 1 <= len(ENTRY) <= 160:
+        raise ValueError(f"entry length {len(ENTRY)} out of range")
+    if "\n" in ENTRY or "\r" in ENTRY:
+        raise ValueError("entry must be a single line")
+    if not ENTRY.strip():
+        raise ValueError("entry must not be only whitespace")
+    ENTRY.encode("utf-8")  # raises UnicodeEncodeError if not UTF-8 encodable
+
+
 def main() -> None:
-    assert 1 <= len(ENTRY) <= 160, f"entry length {len(ENTRY)} out of range"
-    assert "\n" not in ENTRY and "\r" not in ENTRY, "entry must be a single line"
-    assert ENTRY.strip(), "entry must not be only whitespace"
+    validate_entry()
     os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
     with open(OUTPUT_PATH, "w", encoding="utf-8", newline="\n") as f:
         f.write(ENTRY + "\n")
